@@ -3,7 +3,7 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "oks-multimodal"
+name = "oks-connector"
 version = "0.1.0"
 description = "Independent Level-1 multimodal Raw-Bundle extractor for Open Knowledge Studio"
 readme = "README.md"

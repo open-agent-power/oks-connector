@@ -1,4 +1,4 @@
-# oks-multimodal
+# oks-connector
 
 Independent **Level-1** multimodal extractor for
 [Open Knowledge Studio](https://github.com/itxaiohanglover/open-knowledge-studio).
@@ -25,10 +25,10 @@ heavyweight deps such as MinerU / PaddleOCR / faster-whisper):
 
 ```bash
 # one interpreter per modality
-pip install "oks-multimodal[document]"   # docx / pptx via markitdown
-pip install "oks-multimodal[pdf]"        # PDF via MinerU
-pip install "oks-multimodal[watch]"      # video / audio via faster-whisper + rapidocr
-pip install "oks-multimodal[formula]"    # formula OCR via paddleocr
+pip install "oks-connector[document]"   # docx / pptx via markitdown
+pip install "oks-connector[pdf]"        # PDF via MinerU
+pip install "oks-connector[watch]"      # video / audio via faster-whisper + rapidocr
+pip install "oks-connector[formula]"    # formula OCR via paddleocr
 ```
 
 ## Use
