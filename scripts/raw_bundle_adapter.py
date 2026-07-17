@@ -34,11 +34,11 @@ _WATCH_OVERRIDE_LOCK = threading.Lock()
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(prog="oks-connector", description=__doc__)
     parser.add_argument(
         "--version",
         action="version",
-        version=f"oks-raw-bundle {PLUGIN_VERSION}",
+        version=f"oks-connector {PLUGIN_VERSION}",
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
 

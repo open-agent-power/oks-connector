@@ -34,13 +34,13 @@ pip install "oks-connector[formula]"    # formula OCR via paddleocr
 ## Use
 
 ```bash
-oks-raw-bundle --version
-oks-raw-bundle route  <source>                       # print the extraction plan
-oks-raw-bundle image  <img>  --output <bundle_dir>   # OCR + bbox evidence
-oks-raw-bundle markitdown <docx> --output <bundle_dir>
-oks-raw-bundle mineru <mineru_result> --source <pdf> --output <bundle_dir>
-oks-raw-bundle watch  <video> --output <bundle_dir>  # transcript + frames + OCR
-oks-raw-bundle validate <bundle_dir>                 # check a bundle against v0.1
+oks-connector --version
+oks-connector route  <source>                       # print the extraction plan
+oks-connector image  <img>  --output <bundle_dir>   # OCR + bbox evidence
+oks-connector markitdown <docx> --output <bundle_dir>
+oks-connector mineru <mineru_result> --source <pdf> --output <bundle_dir>
+oks-connector watch  <video> --output <bundle_dir>  # transcript + frames + OCR
+oks-connector validate <bundle_dir>                 # check a bundle against v0.1
 ```
 
 Output contract: `raw-multimodal/v0.1` — see `docs/raw-multimodal-standard.md`
@@ -58,7 +58,7 @@ instead of the in-repo script path. For example:
 or, if the modality's interpreter is on PATH:
 
 ```json
-"command_argv": ["oks-raw-bundle", "watch", "{input}", "--output", "{output}"]
+"command_argv": ["oks-connector", "watch", "{input}", "--output", "{output}"]
 ```
 
 `{watch_python}` / `{mineru_python}` / `{document_python}` are resolved from

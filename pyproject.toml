@@ -14,7 +14,7 @@ license = { text = "Apache-2.0" }
 dependencies = []
 
 [project.scripts]
-oks-raw-bundle = "raw_bundle_adapter:main"
+oks-connector = "raw_bundle_adapter:main"
 
 [project.optional-dependencies]
 document = ["markitdown[docx]==0.1.6"]
