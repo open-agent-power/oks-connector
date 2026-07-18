@@ -9,6 +9,19 @@ description = "Independent Level-1 multimodal Raw-Bundle extractor for Open Know
 readme = "README.md"
 requires-python = ">=3.12"
 license = { text = "Apache-2.0" }
+authors = [{ name = "open-agent-power" }]
+keywords = ["multimodal", "extractor", "pdf", "ocr", "transcription", "knowledge-base"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Multimedia",
+  "Topic :: Text Processing",
+]
 # Core CLI is stdlib-only. Heavy extractors are opt-in per-modality extras,
 # each meant to live in its own isolated interpreter (see README).
 dependencies = []
@@ -16,15 +29,21 @@ dependencies = []
 [project.scripts]
 oks-connector = "raw_bundle_adapter:main"
 
+[project.urls]
+Homepage = "https://github.com/open-agent-power/oks-connector"
+Repository = "https://github.com/open-agent-power/oks-connector"
+
 [project.optional-dependencies]
 document = ["markitdown[docx]==0.1.6"]
 pdf = ["mineru==3.4.4"]
+# NOTE: the watch pipeline also needs `watch-skill`, which is only available
+# from Git and cannot be declared here (PyPI forbids direct URL dependencies).
+# Install it in the isolated interpreter via scripts/watch_extract_requirements.txt.
 watch = [
   "faster-whisper==1.2.1",
   "rapidocr==3.9.1",
   "onnxruntime==1.27.0",
   "yt-dlp==2026.7.4",
-  "watch-skill @ git+https://github.com/oxbshw/watch-skill.git@bf177b09a4c8a4d850c878f3965caecf971555e6",
 ]
 formula = [
   "paddlepaddle==3.2.0",
