@@ -65,8 +65,9 @@ def test_package_mineru_preserves_page_bbox_and_assets(tmp_path):
         )
     )
 
-    document = (output / "document.md").read_text(encoding="utf-8")
+    document = (output / "content.md").read_text(encoding="utf-8")
     assert "assets/images/formula.jpg" in document
+    assert not (output / "document.md").exists()
     assert (output / "assets" / "images" / "formula.jpg").is_file()
 
     evidence = [
@@ -127,7 +128,8 @@ def test_package_markitdown_preserves_slides_media_and_unresolved_refs(tmp_path)
     assert "![cover](Image0.jpg)" in (output / "extractor-output.md").read_text(
         encoding="utf-8"
     )
-    assert "未映射图片引用" in (output / "document.md").read_text(encoding="utf-8")
+    assert "未映射图片引用" in (output / "content.md").read_text(encoding="utf-8")
+    assert not (output / "document.md").exists()
     evidence = [
         json.loads(line)
         for line in (output / "evidence.jsonl").read_text(encoding="utf-8").splitlines()
@@ -179,12 +181,43 @@ def test_package_markitdown_maps_pptx_placeholders_via_ooxml_relationships(tmp_p
         )
     )
 
-    document = (output / "document.md").read_text(encoding="utf-8")
+    document = (output / "content.md").read_text(encoding="utf-8")
     quality = json.loads((output / "quality-report.json").read_text(encoding="utf-8"))
     assert "![cover](assets/ppt-media/slide-image.png)" in document
     assert quality["mapped_asset_references"] == 1
     assert quality["unresolved_asset_references"] == 0
     assert quality["coverage_status"] == "passed"
+    assert adapter.validate_bundle(output)["valid"] is True
+
+
+def test_package_markitdown_plain_text_docx_skips_duplicate_markdown_files(tmp_path):
+    source = tmp_path / "plain.docx"
+    with zipfile.ZipFile(source, "w") as archive:
+        archive.writestr("word/document.xml", "<w:document/>")
+    markdown = tmp_path / "plain.md"
+    markdown.write_text("# 标题\n\n纯文本正文，无图片。\n", encoding="utf-8")
+    output = tmp_path / "plain-bundle"
+
+    adapter.package_markitdown(
+        Namespace(
+            source=source,
+            markdown=markdown,
+            output=output,
+            title="纯文本文档",
+            extractor_version="0.1.6",
+            warning=[],
+            benchmark=True,
+            overwrite=False,
+        )
+    )
+
+    assert not (output / "document.md").exists()
+    assert not (output / "extractor-output.md").exists()
+    content = (output / "content.md").read_text(encoding="utf-8")
+    assert "纯文本正文" in content
+    raw = (output / "raw.md").read_text(encoding="utf-8")
+    assert "document.md" not in raw
+    assert "extractor-output.md" not in raw
     assert adapter.validate_bundle(output)["valid"] is True
 
 

@@ -29,7 +29,7 @@ from urllib.parse import urlparse
 
 
 SCHEMA_VERSION = "raw-multimodal/v0.1"
-PLUGIN_VERSION = "0.1.0"
+PLUGIN_VERSION = "0.1.1"
 _WATCH_OVERRIDE_LOCK = threading.Lock()
 
 
@@ -457,7 +457,6 @@ def package_mineru(args: argparse.Namespace) -> Path:
             image_map[image.name] = f"assets/images/{image.name}"
 
     document = rewrite_mineru_images(markdown_path.read_text(encoding="utf-8"))
-    (output / "document.md").write_text(document, encoding="utf-8", newline="\n")
     (output / "content.md").write_text(document, encoding="utf-8", newline="\n")
     evidence_count = write_jsonl(
         output / "evidence.jsonl", mineru_evidence(entries, image_map)
@@ -558,7 +557,6 @@ benchmark: {str(bool(args.benchmark)).lower()}
 ## Raw提取物
 
 - [可读Raw正文](content.md)
-- [文档正文](document.md)
 """ + (
         f"- [公式候选](formula-candidates.json)：{formula_candidate_count}个独立公式块\n"
         if formula_candidate_count else ""
@@ -885,12 +883,11 @@ def package_markitdown(args: argparse.Namespace) -> Path:
     packaged_document = neutralize_unresolved_images(
         mapped_document, set(unresolved)
     )
-    (output / "extractor-output.md").write_text(
-        document, encoding="utf-8", newline="\n"
-    )
-    (output / "document.md").write_text(
-        packaged_document, encoding="utf-8", newline="\n"
-    )
+    extractor_output_diverged = document != packaged_document
+    if extractor_output_diverged:
+        (output / "extractor-output.md").write_text(
+            document, encoding="utf-8", newline="\n"
+        )
     (output / "content.md").write_text(
         packaged_document, encoding="utf-8", newline="\n"
     )
@@ -996,9 +993,10 @@ benchmark: {str(bool(args.benchmark)).lower()}
 ## Raw提取物
 
 - [可读Raw正文](content.md)
-- [文档正文](document.md)
-- [提取器原始Markdown](extractor-output.md)
-- [原子证据](evidence.jsonl)：{evidence_count}条
+""" + (
+        "- [提取器原始Markdown](extractor-output.md)\n"
+        if extractor_output_diverged else ""
+    ) + f"""- [原子证据](evidence.jsonl)：{evidence_count}条
 - [元数据](metadata.json)
 - [质量报告](quality-report.json)
 - `assets/original/`：原始文件
