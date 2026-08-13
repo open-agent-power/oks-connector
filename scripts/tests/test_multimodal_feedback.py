@@ -3,7 +3,7 @@ from argparse import Namespace
 from pathlib import Path
 
 
-MODULE_PATH = Path(__file__).parents[1] / "multimodal_feedback.py"
+MODULE_PATH = Path(__file__).parents[2] / "oks_connector" / "multimodal_feedback.py"
 SPEC = importlib.util.spec_from_file_location("multimodal_feedback", MODULE_PATH)
 assert SPEC and SPEC.loader
 feedback = importlib.util.module_from_spec(SPEC)

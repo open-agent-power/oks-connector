@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 
 
-MODULE_PATH = Path(__file__).parents[1] / "formula_candidates.py"
+MODULE_PATH = Path(__file__).parents[2] / "oks_connector" / "formula_candidates.py"
 SPEC = importlib.util.spec_from_file_location("formula_candidates", MODULE_PATH)
 assert SPEC and SPEC.loader
 formula = importlib.util.module_from_spec(SPEC)

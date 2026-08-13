@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "oks-connector"
-version = "0.1.1"
+version = "0.2.0"
 description = "Independent Level-1 multimodal Raw-Bundle extractor for Open Knowledge Studio"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -27,7 +27,7 @@ classifiers = [
 dependencies = []
 
 [project.scripts]
-oks-connector = "raw_bundle_adapter:main"
+oks-connector = "oks_connector.raw_bundle_adapter:main"
 
 [project.urls]
 Homepage = "https://github.com/open-agent-power/oks-connector"
@@ -53,10 +53,11 @@ formula = [
 ]
 
 [tool.setuptools]
-py-modules = ["raw_bundle_adapter", "formula_candidates", "multimodal_feedback"]
+packages = ["oks_connector", "oks_connector.extractors"]
 
 [tool.setuptools.package-dir]
-"" = "scripts"
+"oks_connector" = "oks_connector"
 
 [tool.pytest.ini_options]
 testpaths = ["scripts/tests"]
+pythonpath = ["."]
