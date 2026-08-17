@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "oks-connector"
-version = "0.2.0"
-description = "Independent Level-1 multimodal Raw-Bundle extractor for Open Knowledge Studio"
+version = "0.3.0"
+description = "Independent Level-1 multimodal Raw-Bundle extractor + built-in search backends (code) for Open Knowledge Studio"
 readme = "README.md"
 requires-python = ">=3.12"
 license = { text = "Apache-2.0" }
@@ -28,6 +28,12 @@ dependencies = []
 
 [project.scripts]
 oks-connector = "oks_connector.raw_bundle_adapter:main"
+
+# Built-in search backend: `oks config set search_backend code` or recall via
+# --backend code. Third parties register their own via the same entry_points
+# group (e.g. a standalone oks-connector-codegraph package).
+[project.entry-points."oks_search_backend"]
+code = "oks_connector.search.code:CodeSearchBackend"
 
 [project.urls]
 Homepage = "https://github.com/open-agent-power/oks-connector"
@@ -53,7 +59,7 @@ formula = [
 ]
 
 [tool.setuptools]
-packages = ["oks_connector", "oks_connector.extractors"]
+packages = ["oks_connector", "oks_connector.extractors", "oks_connector.search"]
 
 [tool.setuptools.package-dir]
 "oks_connector" = "oks_connector"
