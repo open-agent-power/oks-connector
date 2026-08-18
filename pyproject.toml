@@ -34,6 +34,7 @@ oks-connector = "oks_connector.raw_bundle_adapter:main"
 # group (e.g. a standalone oks-connector-codegraph package).
 [project.entry-points."oks_search_backend"]
 code = "oks_connector.search.code:CodeSearchBackend"
+embedding = "oks_connector.search.embedding:EmbeddingBackend"
 
 [project.urls]
 Homepage = "https://github.com/open-agent-power/oks-connector"
@@ -42,6 +43,7 @@ Repository = "https://github.com/open-agent-power/oks-connector"
 [project.optional-dependencies]
 document = ["markitdown[docx]==0.1.6"]
 pdf = ["mineru==3.4.4"]
+embedding = ["sentence-transformers>=2.2", "numpy>=1.24"]
 # NOTE: the watch pipeline also needs `watch-skill`, which is only available
 # from Git and cannot be declared here (PyPI forbids direct URL dependencies).
 # Install it in the isolated interpreter via scripts/watch_extract_requirements.txt.
