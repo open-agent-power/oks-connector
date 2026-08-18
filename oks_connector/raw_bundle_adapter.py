@@ -455,7 +455,11 @@ def ingest_child_argv(
         command = [*base, "watch", args.source, "--output", str(output)]
         if plan["source_type"] == "audio" or tier == "quick":
             command.append("--transcript-only")
-        if plan["source_type"] == "video" and tier == "quick":
+        if (
+            plan["source_type"] == "video"
+            and tier == "quick"
+            and is_url(args.source)
+        ):
             command.append("--no-local-whisper")
         command.extend(["--subtitle-langs", args.subtitle_langs, "--evidence-tier", tier])
         timeout = getattr(args, "timeout_seconds", None)
@@ -504,6 +508,23 @@ def ingest_timeout_seconds(args: argparse.Namespace, extractor: str | None = Non
         # comparable to caption-only video or document extraction.
         return 900.0
     return 120.0 if canonical_evidence_tier(args.mode) == "quick" else 900.0
+
+
+def _require_usable_bundle(output: Path) -> None:
+    """Reject a child result that produced no usable extraction evidence."""
+    metadata_path = output / "metadata.json"
+    if not metadata_path.is_file():
+        raise RuntimeError(f"提取器未生成 metadata.json: {metadata_path}")
+    try:
+        metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise RuntimeError(f"无法读取提取状态: {metadata_path}: {exc}") from exc
+    processing_status = metadata.get("processing_status")
+    if processing_status not in {"complete", "partial"}:
+        raise RuntimeError(
+            "提取器没有产生可用证据: "
+            f"processing_status={processing_status or 'missing'}"
+        )
 
 
 def _ffprobe_preflight(source: str, plan: dict[str, Any]) -> None:
@@ -597,6 +618,7 @@ def run_ingest(args: argparse.Namespace) -> int:
                 f"\n--- stderr (最后 3000 字符) ---\n{detail[-3000:] or '(无)'}"
                 f"\n--- 命令 ---\n{' '.join(command)}"
             )
+        _require_usable_bundle(output)
         return 0
 
     with tempfile.TemporaryDirectory(prefix="oks-mineru-") as temporary:
@@ -694,6 +716,7 @@ def run_ingest(args: argparse.Namespace) -> int:
                 f"\n--- stderr (最后 3000 字符) ---\n{detail[-3000:]}"
                 f"\n--- 命令 ---\n{' '.join(command)}"
             )
+        _require_usable_bundle(output)
         return 0
 
 
