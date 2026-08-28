@@ -20,8 +20,16 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+# v0.5.0: 切 bge-small-zh-v1.5（BAAI 中文优化，512 维）替代 MiniLM（英文）。
+# CV from OpenViking local_embedders.py —— MiniLM 中文 R@1 反低 20 点，bge-small-zh 是中文 SOTA。
+# bge-small-zh query 需加 instruction 前缀（passage 不加），见 BGE_ZH_QUERY_INSTRUCTION。
 DEFAULT_MODEL = os.environ.get(
-    "OKS_EMBEDDING_MODEL", "paraphrase-multilingual-MiniLM-L12-v2"
+    "OKS_EMBEDDING_MODEL", "BAAI/bge-small-zh-v1.5"
+)
+# bge-small-zh 官方推荐 query 前缀（CV from OpenViking DEFAULT_BGE_ZH_QUERY_INSTRUCTION）。
+# 仅 query 加，document/passage 不加（bge 不对称设计）。
+BGE_ZH_QUERY_INSTRUCTION = os.environ.get(
+    "OKS_BGE_QUERY_INSTRUCTION", "为这个句子生成表示以用于检索相关文章："
 )
 
 
@@ -74,7 +82,14 @@ class EmbeddingBackend:
                     "embedding backend 需 sentence-transformers。装："
                     "pip install 'oks-connector[embedding]'"
                 ) from e
-            self._model = SentenceTransformer(DEFAULT_MODEL)
+            # 支持本地路径（绕网络）：OKS_EMBEDDING_MODEL 指向已下载模型目录时
+            # 直接加载，不查 HF hub。否则按模型名从 HF 加载。
+            from pathlib import Path
+            model_spec = DEFAULT_MODEL
+            local_path = Path(model_spec)
+            if local_path.exists() and local_path.is_dir():
+                model_spec = str(local_path)
+            self._model = SentenceTransformer(model_spec)
         return self._model
 
     @staticmethod
@@ -139,7 +154,13 @@ class EmbeddingBackend:
             return []
 
         model = self._load_model()
-        qvec = model.encode([query], normalize_embeddings=True, show_progress_bar=False)
+        # bge-small-zh: query 加 instruction 前缀（document 不加，非对称）
+        q_text = (
+            BGE_ZH_QUERY_INSTRUCTION + query
+            if "bge" in DEFAULT_MODEL.lower()
+            else query
+        )
+        qvec = model.encode([q_text], normalize_embeddings=True, show_progress_bar=False)
         qvec = np.asarray(qvec[0], dtype=np.float32)
         scores = self._vectors @ qvec  # cosine（已 L2 归一）
 
